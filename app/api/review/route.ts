@@ -50,7 +50,11 @@ export async function POST(request: Request) {
     }),
   });
 
-  if (!response.ok) return Response.json({ error: "Kimi 审核请求失败，请检查本机 API Key 与账户权限。" }, { status: 502 });
+  if (!response.ok) {
+    const providerMessage = (await response.text()).replace(/\s+/g, " ").slice(0, 500);
+    console.error(`Kimi API request failed: HTTP ${response.status} ${providerMessage}`);
+    return Response.json({ error: "Kimi 审核请求失败，请稍后重试。" }, { status: 502 });
+  }
 
   try {
     const result = await response.json() as { choices?: Array<{ message?: { content?: string } }> };
