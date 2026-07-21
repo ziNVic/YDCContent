@@ -33,31 +33,31 @@ export async function POST(request: Request) {
   if (!text?.trim()) return Response.json({ error: "文章内容不能为空。" }, { status: 400 });
   const paragraphs = text.split(/\r?\n/).filter((paragraph) => paragraph.trim());
 
-  const apiKey = process.env.KIMI_API_KEY;
-  if (!apiKey) return Response.json({ error: "未读取到本机 Kimi API Key。请使用“npm run dev:kimi”启动本地服务。" }, { status: 503 });
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) return Response.json({ error: "未读取到线上 OpenAI API Key。请联系管理员配置。" }, { status: 503 });
 
-  const response = await fetch(`${process.env.KIMI_BASE_URL ?? "https://api.kimi.com/coding/v1"}/chat/completions`, {
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
-      "User-Agent": "YDC-ContentReview/1.03",
     },
     body: JSON.stringify({
-      model: "kimi-for-coding",
+      model: "gpt-5.5",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `请审核以下文章。每段前的编号用于返回 paragraph，不属于文章内容：\n\n${paragraphs.map((paragraph, index) => `[第${index + 1}段] ${paragraph}`).join("\n\n")}` },
       ],
-      thinking: { type: "disabled" },
-      max_tokens: 2200,
+      reasoning_effort: "none",
+      response_format: { type: "json_object" },
+      max_completion_tokens: 2200,
     }),
   });
 
   if (!response.ok) {
     const providerMessage = (await response.text()).replace(/\s+/g, " ").slice(0, 500);
-    console.error(`Kimi API request failed: HTTP ${response.status} ${providerMessage}`);
-    return Response.json({ error: "Kimi 审核请求失败，请稍后重试。" }, { status: 502 });
+    console.error(`OpenAI API request failed: HTTP ${response.status} ${providerMessage}`);
+    return Response.json({ error: "OpenAI 审核请求失败，请稍后重试。" }, { status: 502 });
   }
 
   try {
