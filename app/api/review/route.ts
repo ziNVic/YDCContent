@@ -38,7 +38,11 @@ export async function POST(request: Request) {
 
   const response = await fetch(`${process.env.KIMI_BASE_URL ?? "https://api.kimi.com/coding/v1"}/chat/completions`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+      "User-Agent": "YDC-ContentReview/1.03",
+    },
     body: JSON.stringify({
       model: "kimi-for-coding",
       messages: [
