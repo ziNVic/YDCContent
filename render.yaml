@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: ydc-contentreview
+    runtime: node
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: MOONSHOT_API_KEY
+        sync: false
