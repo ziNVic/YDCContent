@@ -15,8 +15,10 @@ const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
   vars: {
-    KIMI_API_KEY: process.env.KIMI_API_KEY ?? "",
-    KIMI_BASE_URL: process.env.KIMI_BASE_URL ?? "https://api.kimi.com/coding/v1",
+    // Production values are configured as encrypted Cloudflare Worker secrets.
+    // This local placeholder lets Vinext include the runtime binding without
+    // placing any real key in the source code or generated config.
+    MOONSHOT_API_KEY: process.env.MOONSHOT_API_KEY ?? "",
   },
   d1_databases: d1
     ? [
